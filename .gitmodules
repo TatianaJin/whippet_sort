@@ -1,0 +1,4 @@
+[submodule "velox"]
+	path = velox
+	url = https://github.com/Kasma-Inc/velox.git
+	branch = main
