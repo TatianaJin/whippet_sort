@@ -15,7 +15,7 @@ The benchmark includes several warm-up rounds to mitigate the impact of cold sta
 | Parameter | Description | Default Value |
 | --------- | ----------- | -------------- |
 | -s,--scale| TPCH scale  |  1        |
-| -w,--wamup | Number of warmup rounds| 2|
+| -w,--wamrup | Number of warmup rounds| 2|
 | -i,--iterations| Number of iterations per test| 20 |
 | -f,--output | Output file name for benchmark | duckdb_bench_res_{scale}.json|
 
