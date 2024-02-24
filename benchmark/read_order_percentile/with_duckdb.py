@@ -88,7 +88,7 @@ def benchmark(discription, attr_num, benchmark_func, warmup, iterations, *args):
     std_time = np.std(times)
 
     # Calculate the percentiles for the average
-    avg_percentile = _calculate_percentile(times, median_time)
+    avg_percentile = _calculate_percentile(times, avg_time)
 
     print(f"Benchmark {discription} finished. Avg time: {avg_time} ms.")
     # Return a dictionary
