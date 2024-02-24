@@ -42,7 +42,7 @@ An in-memory connection is utilized for DuckDB to preclude I/O overhead, and the
 
 ## Prepared Query
 
-Sorting tests are conducted based on number, string, and mixed criteria. Sorting keys vary from 1 to 4 to assess the impact of additional sorting keys. The selection of attributes for sorting, especially for multiple key scenarios (e.g., `ORDER BY A, B`), is designed to ensure meaningful sorting by choosing attributes with many repeated values for A to necessitate sorting on B.
+Sorting tests are conducted based on number, string, and mixed criteria. Sorting keys vary from 1 to 4 to assess the impact of additional sorting keys. The selection of attributes for sorting, especially for multiple key scenarios (e.g., `ORDER BY A, B`), is designed to ensure meaningful sorting by choosing attributes with many repeated values for A to necessitate sorting on B. Attributes are selected based on the description found in [TPCH Standard Specification](https://www.tpc.org/tpc_documents_current_versions/pdf/tpc-h_v2.17.1.pdf).
 
 # Current Result (warmup = 2,iteration = 100, scale = 1)
 

@@ -188,7 +188,7 @@ def string_bench(warmup, itr, con):
     query_one_item_fixed = "SELECT * FROM lineitem ORDER BY L_SHIPMODE"
     query_two_item = "SELECT * FROM lineitem ORDER BY L_SHIPMODE, L_SHIPINSTRUCT"
     query_three_item = (
-        "SELECT * FROM lineitem ORDER BY L_SHIPMODE, L_SHIPINSTRUCT, L_RETURNFLAG"
+        "SELECT * FROM lineitem ORDER BY L_SHIPMODE DESC, L_SHIPINSTRUCT, L_RETURNFLAG"
     )
     query_four_item = "SELECT * FROM lineitem ORDER BY L_SHIPMODE, L_SHIPINSTRUCT, L_RETURNFLAG, L_COMMENT"
     res1 = benchmark(
