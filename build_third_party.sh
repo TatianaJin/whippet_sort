@@ -23,7 +23,7 @@ FOLLY_SOURCE=folly-v2022.11.14.00
 FOLLY_SHA256="b249436cb61b6dfd5288093565438d8da642b07ae021191a4042b221bc1bdc0e"
 
 # arrow
-ARROW_VERSION=apache-arrow-15.0.0
+ARROW_VERSION=release-15.0.0-rc0
 
 check_if_source_exist() {
   if [ -z $1 ]; then
@@ -79,7 +79,7 @@ build_folly() {
 download_arrow() {
   mkdir -p $third_party_dir
   pushd $third_party_dir
-  if [ -e arrow ]; then git clone https://github.com/apache/arrow.git; fi
+  if [ ! -e arrow ]; then git clone https://github.com/apache/arrow.git; fi
   cd arrow
   git checkout ${ARROW_VERSION}
   popd

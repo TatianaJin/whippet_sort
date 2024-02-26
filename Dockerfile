@@ -41,3 +41,6 @@ RUN pip install pyarrow
 
 ### duckdb
 RUN pip install duckdb
+
+### benchmark related libs. 
+RUN pip install matplotlib

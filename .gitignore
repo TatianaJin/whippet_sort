@@ -34,3 +34,7 @@
 build
 data
 third_party
+
+# Benchmark Results
+benchmark/read_order_percentile/*.json
+benchmark/read_order_percentile/*.png
