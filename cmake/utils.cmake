@@ -17,7 +17,7 @@
 # _dir is the input directory
 # the target list is output to _result
 function(_get_all_targets _result _dir)
-  message(STATUS "_get_all_targets DIRECTORY ${_dir}")
+  message(DEBUG "_get_all_targets DIRECTORY ${_dir}")
   get_property(
     _subdirs
     DIRECTORY "${_dir}"

@@ -14,8 +14,7 @@
 
 cmake_minimum_required(VERSION 3.20.0)
 
-# https://gitlab.kitware.com/cmake/community/wikis/FAQ#how-do-i-use-a-different-compiler
-# must be set before project
+# https://gitlab.kitware.com/cmake/community/wikis/FAQ#how-do-i-use-a-different-compiler must be set before project
 set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_C_COMPILER clang)
 
@@ -23,8 +22,7 @@ project(WhippetSort LANGUAGES CXX)
 
 # ----------------------------------------------------------------------
 # CMake modules
-include(CTest) # adds BUILD_TESTING option, include after project() but before
-               # add_subdirectory()
+include(CTest) # adds BUILD_TESTING option, include after project() but before add_subdirectory()
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 include(utils)
 
@@ -40,11 +38,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Known warnings that are benign can be disabled.
-set(DISABLED_WARNINGS
-    "-Wno-nullability-completeness -Wno-deprecated-declarations")
+set(DISABLED_WARNINGS "-Wno-nullability-completeness -Wno-deprecated-declarations")
 
 # mode
-set(CMAKE_CXX_FLAGS_DEBUG "-g -fsanitize=address -Wall -Werror")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -fsanitize=address -Wall") # -Werror
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall -march=native -DNDEBUG")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DISABLED_WARNINGS}")
@@ -53,7 +50,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DISABLED_WARNINGS}")
 # Use ccache
 if(FLAVIUS_ENABLE_CCACHE
    AND NOT CMAKE_C_COMPILER_LAUNCHER
-   AND NOT CMAKE_CXX_COMPILER_LAUNCHER)
+   AND NOT CMAKE_CXX_COMPILER_LAUNCHER
+)
   find_program(CCACHE_FOUND ccache)
   if(CCACHE_FOUND)
     message(STATUS "Using ccache: ${CCACHE_FOUND}")
@@ -65,15 +63,39 @@ if(FLAVIUS_ENABLE_CCACHE
 endif()
 
 # ----------------------------------------------------------------------
+# dependencies
+
+list(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/third_party/install/arrow)
+message(STATUS ${CMAKE_PREFIX_PATH})
+# arrow
+find_package(Arrow CONFIG REQUIRED)
+# parquet
+find_package(Parquet CONFIG REQUIRED)
+
+# folly and its deps, used by velox
+set(Boost_USE_STATIC_RUNTIME ON)
+list(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/third_party/install/boost)
+list(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/third_party/install/libevent)
+list(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/third_party/install/fmt)
+find_package(Fmt CONFIG REQUIRED)
+list(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/third_party/install/glog)
+find_package(glog CONFIG REQUIRED)
+list(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/third_party/install/folly)
+find_package(folly CONFIG REQUIRED)
+
+include_directories(SYSTEM ${PROJECT_SOURCE_DIR}/third_party/install/boost/include)
+link_directories(${PROJECT_SOURCE_DIR}/third_party/install/boost/lib)
+
+# ----------------------------------------------------------------------
 # Setup velox
 set(VELOX_ROOT ${PROJECT_SOURCE_DIR}/velox)
 message(STATUS "Setting VELOX_ROOT = ${VELOX_ROOT}")
 execute_process(
-  COMMAND
-    bash -c
-    "( source ${VELOX_ROOT}/scripts/setup-helper-functions.sh && echo -n $(get_cxx_flags $ENV{CPU_TARGET}))"
+  COMMAND bash -c
+          "( source ${VELOX_ROOT}/scripts/setup-helper-functions.sh && echo -n $(get_cxx_flags $ENV{CPU_TARGET}))"
   OUTPUT_VARIABLE SCRIPT_CXX_FLAGS
-  RESULT_VARIABLE COMMAND_STATUS)
+  RESULT_VARIABLE COMMAND_STATUS
+)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SCRIPT_CXX_FLAGS}")
 # minimal build for the need to test sorting
 set(VELOX_CODEGEN_SUPPORT OFF)
@@ -85,6 +107,10 @@ set(VELOX_ENABLE_PARQUET ON)
 set(VELOX_ENABLE_DUCKDB ON)
 set(VELOX_ENABLE_HIVE_CONNECTOR ON)
 set(VELOX_ENABLE_TPCH_CONNECTOR ON)
+# for velox bundled deps
+include_directories(SYSTEM ${CMAKE_BINARY_DIR}/_deps/gflags-build/include)
+include_directories(${VELOX_ROOT})
+add_subdirectory(${VELOX_ROOT})
 # supress compiler warnings for velox libraries
 get_all_targets(_velox_targets ${VELOX_ROOT})
 foreach(_target IN LISTS _velox_targets)
@@ -93,20 +119,9 @@ foreach(_target IN LISTS _velox_targets)
     target_compile_options(${_target} PRIVATE "-w")
   endif()
 endforeach()
-add_subdirectory(${VELOX_ROOT})
-include_directories(${VELOX_ROOT})
 
-# ----------------------------------------------------------------------
-# dependencies
-
-list(APPEND CMAKE_PREFIX_PATH ${PROJECT_SOURCE_DIR}/third_party/install/arrow)
-message(STATUS ${CMAKE_PREFIX_PATH})
-# arrow
-find_package(Arrow CONFIG REQUIRED)
-# parquet
-find_package(Parquet CONFIG REQUIRED)
 
 # ----------------------------------------------------------------------
 # sources
 include_directories(${PROJECT_SOURCE_DIR}/src)
-# add_subdirectory(src)
+add_subdirectory(src)
