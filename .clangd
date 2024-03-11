@@ -1,0 +1,6 @@
+CompileFlags:
+  Add: -ferror-limit=0
+If:
+  PathExclude: third_party/.*
+Diagnostics:
+  UnusedIncludes: Strict
